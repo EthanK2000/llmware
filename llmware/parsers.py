@@ -2916,7 +2916,7 @@ class Parser:
 
         return output
 
-    def parse_website(self, url_base, write_to_db=True, save_history=True, get_links=True, max_links=10):
+    def parse_website(self, url_base, write_to_db=True, save_history=True, get_links=True, max_links=10, attrs=None):
 
         """ Main entrypoint for parsing a website. """
 
@@ -2955,7 +2955,7 @@ class Parser:
 
         # iterative parse thru website to follow links enabled
 
-        website = WebSiteParser(url_base, reset_img_folder=True, local_file_path=self.website_work_folder)
+        website = WebSiteParser(url_base, reset_img_folder=True, local_file_path=self.website_work_folder, attrs=attrs)
 
         if website.success_code == 1:
 
@@ -3105,8 +3105,12 @@ class Parser:
             upload_fp = self.library.file_copy_path
         else:
             upload_fp = self.parser_tmp_folder
-
-        shutil.copy(os.path.join(fp_tmp,website_name), os.path.join(upload_fp, out_name))
+        
+        try:
+            shutil.copy(os.path.join(fp_tmp,website_name), os.path.join(upload_fp, out_name))
+        except IOError as io_err:
+            os.makedirs(os.path.dirname(os.path.join(upload_fp, out_name)))
+            shutil.copy(os.path.join(fp_tmp,website_name), os.path.join(upload_fp, out_name))
 
         if save_history and write_to_db_on == 0:
             ParserState().save_parser_output(self.parser_job_id, self.parser_output)

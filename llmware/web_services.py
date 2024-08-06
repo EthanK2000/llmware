@@ -353,7 +353,7 @@ class WebSiteParser:
     """
 
     def __init__(self, url_or_fp, link="/", save_images=True, reset_img_folder=False, local_file_path=None,
-                 from_file=False, text_only=False, unverified_context=False):
+                 from_file=False, text_only=False, unverified_context=False, attrs=None):
 
         try:
             from bs4 import BeautifulSoup
@@ -424,18 +424,20 @@ class WebSiteParser:
             # this is the most likely default case -interpret url_or_fp as url
             try:
                 req = Request(self.url_base, headers={'User-Agent': 'Mozilla/5.0'},unverifiable=True)
-
-                if self.unverified_context:
-                    import ssl
-                    ssl._create_default_https_context = ssl._create_unverified_context
+                try:
                     html = urlopen(req).read()
-                else:
-                    html = urlopen(req).read()
+                except:
+                    try:
+                        import ssl
+                        ssl._create_default_https_context = ssl._create_unverified_context
+                        html = urlopen(req).read()
+                    except:
+                        html = requests.get(self.url_base, stream=True, headers={'User-Agent': 'Mozilla/5.0'}).content
 
                 bs = BeautifulSoup(html, features="lxml")
 
                 self.bs = bs
-                self.html = bs.findAll()
+                self.html = bs.findAll(attrs=attrs)
 
                 out_str = ""
                 for x in self.html:
