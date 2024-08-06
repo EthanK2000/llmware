@@ -14,3 +14,5 @@ docs/_site/
 
 # Mac
 .DS_Store/
+
+.env
