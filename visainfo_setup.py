@@ -1,4 +1,5 @@
 from llmware.library import Library
+from llmware.configs import LLMWareConfig
 from llmware.parsers import Parser
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -6,10 +7,12 @@ from urllib.parse import urlparse, parse_qs
 import requests
 import os
 import argparse
-
 from dotenv import load_dotenv
 
 load_dotenv()
+
+LLMWareConfig().set_active_db("mongo")
+LLMWareConfig().set_vector_db("milvus")
 
 def create_country_library(country: str):
     client = MongoClient(os.environ['MONGODB_ATLAS_URI'], server_api=ServerApi('1'))
